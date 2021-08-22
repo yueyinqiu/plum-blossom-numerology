@@ -21,7 +21,7 @@ export default class HexagramText extends React.Component<{}, HexagramTextState>
             return (<div className="HexagramTextPlaceholder">
                 点击查看卦辞爻辞<br /><br />
                 本站界面参考：<a href="https://gitee.com/foxnes/zy-mhys">zy-mhys</a><br />
-                卦名卦辞参考：<a href="https://www.nuget.org/profiles/YiJingFramework">YiJingFramework</a>
+                卦名卦辞参考：<a href="https://www.nuget.org/profiles/YiJingFramework">YiJingFramework</a><br />
                 农历取时参考：<a href="https://github.com/6tail/lunar-typescript">lunar-typescript</a><br />
             </div>);
         else
