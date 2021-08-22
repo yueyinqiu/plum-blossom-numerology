@@ -7,6 +7,16 @@
     margin-left: 5%;
 }
 
+@media screen and (max-width: 380px) {
+    .Hexagram {
+        float: left;
+        width: 32%;
+    }
+    .Hexagram+.Hexagram {
+        margin-left: 2%;
+    }
+}
+
 .Hexagram .Trigram {
     background-color: #f6f6f6;
 }

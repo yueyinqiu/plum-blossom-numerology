@@ -21,6 +21,13 @@
     font-weight: 800;
 }
 
+@media screen and (max-width: 380px) {
+    .ActionBar input,
+    .ActionBar button {
+        font-size: 15px;
+    }
+}
+
 .ActionBar button:active {
     background-color: #171717;
 }
