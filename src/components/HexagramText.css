@@ -1,0 +1,10 @@
+.HexagramText {
+    padding: 15px;
+    white-space: pre-wrap;
+}
+
+.HexagramTextPlaceholder {
+    padding: 15px;
+    white-space: pre-wrap;
+    text-align: center;
+}

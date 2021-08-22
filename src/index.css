@@ -1,0 +1,15 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+::selection {
+    color: #e5e5e5;
+    background-color: #1f1f1f;
+}
+
+a {
+    color: inherit;
+    text-decoration: underline;
+}

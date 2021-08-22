@@ -1,0 +1,16 @@
+.Taichi {
+    text-align: center;
+    padding-top: 25px;
+    user-select: none;
+    overflow: hidden;
+}
+
+.Taichi img {
+    transition: all 1.5s;
+    transition-timing-function: ease-in-out;
+    width: 4.5cm;
+    height: 4.5cm;
+    display: inline-block;
+    display: block;
+    margin: 0 auto;
+}

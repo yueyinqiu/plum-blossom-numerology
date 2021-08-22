@@ -1,0 +1,37 @@
+.ActionBar {
+    margin: 25px auto;
+    text-align: center;
+    user-select: none;
+}
+
+.ActionBar input {
+    width: 3.5em;
+    padding: 3px 5px;
+    border-radius: 2px;
+    background-color: white;
+    border: 1px solid gray;
+    color: inherit;
+}
+
+.ActionBar input,
+.ActionBar button {
+    font-family: inherit;
+    font-size: 18px;
+    margin: 5px;
+    font-weight: 800;
+}
+
+.ActionBar button:active {
+    background-color: #171717;
+}
+
+.ActionBar button {
+    padding: 4px 18px;
+    background-color: #3F3F3F;
+    color: #e3e3e3;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.1s;
+    outline: none;
+}
