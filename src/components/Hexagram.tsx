@@ -28,7 +28,7 @@ export default class Hexagram extends React.Component<HexagramProperties, Hexagr
         if (number === null) {
             return (
                 <div className="Hexagram">
-                    <div className="HexagramName">༺卦༻</div>
+                    <div className="HexagramName">卦</div>
                     <div className="Trigram">
                         <div className="YangLine"></div>
                         <div className="br"></div>
@@ -56,7 +56,7 @@ export default class Hexagram extends React.Component<HexagramProperties, Hexagr
             <div className="Hexagram" onClick={
                 () => { this.props.showTextFunction(hexagramInfo.getText()) }
             }>
-                <div className="HexagramName">༺{hexagramInfo.getName()}༻</div>
+                <div className="HexagramName">{hexagramInfo.getName()}</div>
                 <div className="Trigram" style={{
                     backgroundColor: hexagramInfo.getUpperFiveElementsColor()
                 }}>
