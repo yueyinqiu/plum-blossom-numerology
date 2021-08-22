@@ -88,9 +88,9 @@ export default class Main extends React.Component {
                 <ActionBar insertFunction={this.insertWithTime.bind(this)} submitFunction={this.changeHexagrams.bind(this)}></ActionBar>
                 <div className="Hexagrams">
                     <Clear></Clear>
-                    <Hexagram ref={this.originalRef} showTextFunction={stf}></Hexagram>
-                    <Hexagram ref={this.interRef} showTextFunction={stf}></Hexagram>
-                    <Hexagram ref={this.changedRef} showTextFunction={stf}></Hexagram>
+                    <Hexagram ref={this.originalRef} showTextFunction={stf} defaultName="点击"></Hexagram>
+                    <Hexagram ref={this.interRef} showTextFunction={stf} defaultName={"\"走你\""}></Hexagram>
+                    <Hexagram ref={this.changedRef} showTextFunction={stf} defaultName="得卦"></Hexagram>
                     <Clear></Clear>
                 </div>
                 <HexagramText ref={this.textRef}></HexagramText>

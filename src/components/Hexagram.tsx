@@ -8,6 +8,7 @@ export interface ShowTextFunction {
 
 export interface HexagramProperties {
     showTextFunction: ShowTextFunction;
+    defaultName: string;
 }
 export interface HexagramState {
     hexagramNumber: number | null;
@@ -28,7 +29,7 @@ export default class Hexagram extends React.Component<HexagramProperties, Hexagr
         if (number === null) {
             return (
                 <div className="Hexagram">
-                    <div className="HexagramName">卦</div>
+                    <div className="HexagramName">{this.props.defaultName}</div>
                     <div className="Trigram">
                         <div className="YangLine"></div>
                         <div className="br"></div>
