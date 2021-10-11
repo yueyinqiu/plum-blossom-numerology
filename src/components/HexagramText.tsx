@@ -11,7 +11,7 @@ export default class HexagramText extends React.Component<{}, HexagramTextState>
         this.state = { text: null };
     }
 
-    public setText(text: string) {
+    public setText(text: string | null) {
         this.setState({ text: text });
     }
 

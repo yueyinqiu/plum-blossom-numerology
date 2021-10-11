@@ -56,28 +56,31 @@ export default class ActionBar extends React.Component<ActionBarProperties, Acti
                         placeholder="爻动" value={this.state.changingValue}
                         onChange={(e) => this.onValueChanged(this.state.upperValue, this.state.lowerValue, e.target.valueAsNumber)} />
 
-                    <button type="button" onClick={() => {
-                        let upper = this.upperRef.current?.valueAsNumber;
-                        let lower = this.lowerRef.current?.valueAsNumber;
-                        let changing = this.changingRef.current?.valueAsNumber;
-                        if (upper === undefined || isNaN(upper))
-                            upper = 1;
-                        if (lower === undefined || isNaN(lower))
-                            lower = 1;
-                        if (changing === undefined || isNaN(changing))
-                            changing = 1;
-                        let s = {
-                            upperValue: upper,
-                            lowerValue: lower,
-                            changingValue: changing
-                        };
-                        this.props.submitFunction(s);
-                        this.changeValues(s);
-                    }}>走你</button>
+                    <button type="button" onClick={() => {this.performSubmit();}}>走你</button>
                     <button type="button" onClick={() =>
                         this.changeValues(this.props.insertFunction(true))}>按时间填入</button>
                 </div>
             </form>
         );
+    }
+
+    performSubmit()
+    {
+        let upper = this.upperRef.current?.valueAsNumber;
+        let lower = this.lowerRef.current?.valueAsNumber;
+        let changing = this.changingRef.current?.valueAsNumber;
+        if (upper === undefined || isNaN(upper))
+            upper = 1;
+        if (lower === undefined || isNaN(lower))
+            lower = 1;
+        if (changing === undefined || isNaN(changing))
+            changing = 1;
+        let s = {
+            upperValue: upper,
+            lowerValue: lower,
+            changingValue: changing
+        };
+        this.props.submitFunction(s);
+        this.changeValues(s);
     }
 }

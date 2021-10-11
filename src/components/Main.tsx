@@ -27,13 +27,27 @@ export default class Main extends React.Component {
         this.textRef.current?.setText(text);
     }
 
+    lastUpper: number | null = null;
+    lastLower: number | null = null;
+    lastChanging: number | null = null;
     private changeHexagrams(states: ActionBarState) {
-        this.taichiRef.current?.rotate();
+        let statesUpper = states.upperValue;
+        let statesLower = states.lowerValue;
+        let statesChanging = states.changingValue;
 
-        let upper = 8 - (states.upperValue % 8 + 8) % 8;
+        if (this.lastUpper === statesUpper &&
+            this.lastLower === statesLower &&
+            this.lastChanging === statesChanging)
+            return;
+
+        this.lastUpper = statesUpper;
+        this.lastLower = statesLower;
+        this.lastChanging = statesChanging;
+
+        let upper = 8 - (statesUpper % 8 + 8) % 8;
         if (upper === 8)
             upper = 0;
-        let lower = 8 - (states.lowerValue % 8 + 8) % 8;
+        let lower = 8 - (statesLower % 8 + 8) % 8;
         if (lower === 8)
             lower = 0;
         // 经过如此转换，需自最小位为上看，如
@@ -41,7 +55,7 @@ export default class Main extends React.Component {
 
         let original = (lower << 3) + upper;
 
-        let changing = 6 - (states.changingValue % 6 + 6) % 6;
+        let changing = 6 - (statesChanging % 6 + 6) % 6;
         if (changing === 6)
             changing = 0;
         let changed = original ^ (1 << changing);
@@ -69,13 +83,24 @@ export default class Main extends React.Component {
         inter <<= 1;
         inter += line5;
 
-        this.originalRef.current?.setHexagram(original);
-        this.interRef.current?.setHexagram(inter);
-        this.changedRef.current?.setHexagram(changed);
+        setTimeout(() => {
+            this.taichiRef.current?.rotate();
+            this.originalRef.current?.setHexagram(null);
+            this.interRef.current?.setHexagram(null);
+            this.changedRef.current?.setHexagram(null);
+            this.textRef.current?.setText(null);
+        });
+
+        setTimeout(() => {
+            this.originalRef.current?.setHexagram(original);
+            this.interRef.current?.setHexagram(inter);
+            this.changedRef.current?.setHexagram(changed);
+        }, 600);
     }
 
     taichiRef = React.createRef<Taichi>();
     textRef = React.createRef<HexagramText>();
+    actionBarRef = React.createRef<ActionBar>();
     originalRef = React.createRef<Hexagram>();
     interRef = React.createRef<Hexagram>();
     changedRef = React.createRef<Hexagram>();
@@ -85,16 +110,24 @@ export default class Main extends React.Component {
         return (
             <div className="Main">
                 <Taichi ref={this.taichiRef}></Taichi>
-                <ActionBar insertFunction={this.insertWithTime.bind(this)} submitFunction={this.changeHexagrams.bind(this)}></ActionBar>
+                <ActionBar ref={this.actionBarRef} insertFunction={this.insertWithTime.bind(this)} submitFunction={this.changeHexagrams.bind(this)}></ActionBar>
                 <div className="Hexagrams">
                     <Clear></Clear>
-                    <Hexagram ref={this.originalRef} showTextFunction={stf} defaultName="点击"></Hexagram>
-                    <Hexagram ref={this.interRef} showTextFunction={stf} defaultName={"\"走你\""}></Hexagram>
-                    <Hexagram ref={this.changedRef} showTextFunction={stf} defaultName="得卦"></Hexagram>
+                    <Hexagram ref={this.originalRef} showTextFunction={stf} defaultName="本"></Hexagram>
+                    <Hexagram ref={this.interRef} showTextFunction={stf} defaultName="互"></Hexagram>
+                    <Hexagram ref={this.changedRef} showTextFunction={stf} defaultName="变"></Hexagram>
                     <Clear></Clear>
                 </div>
                 <HexagramText ref={this.textRef}></HexagramText>
             </div>
         );
+    }
+
+    componentDidMountForTheFirstTime = false;
+    async componentDidMount() {
+        if (!this.componentDidMountForTheFirstTime) {
+            this.componentDidMountForTheFirstTime = true;
+            this.actionBarRef.current?.performSubmit();
+        }
     }
 }

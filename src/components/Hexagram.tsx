@@ -20,7 +20,7 @@ export default class Hexagram extends React.Component<HexagramProperties, Hexagr
         this.state = { hexagramNumber: null };
     }
 
-    public setHexagram(hexagramNumber: number) {
+    public setHexagram(hexagramNumber: number | null) {
         this.setState({ hexagramNumber });
     }
 
