@@ -4,18 +4,21 @@ import './Taichi.css';
 
 
 export interface TaichiState {
-    rotateState: boolean;
+    rotateState: number;
 }
-class Taichi extends React.Component<{},TaichiState> {
+export default class Taichi extends React.Component<{}, TaichiState> {
     constructor(unit: {}) {
         super(unit);
-        this.state = {rotateState: true};
+        this.state = { rotateState: 67 };
     }
     rotate() {
-        this.setState({rotateState: !this.state.rotateState});
+        let rand = Math.random();
+        console.log(rand);
+        this.setState({ rotateState: this.state.rotateState + (rand < 0.5 ? -720 : 720) });
     }
+
     render() {
-        let style = {transform: this.state.rotateState ? 'rotate(65deg)' : 'rotate(965deg)'};
+        let style = { transform: `rotate(${this.state.rotateState}deg)` };
         return (
             <div className="Taichi">
                 <img src={Image} alt="taichi" style={style} onMouseDown={(e) => { e.preventDefault() }} />
@@ -23,5 +26,3 @@ class Taichi extends React.Component<{},TaichiState> {
         );
     }
 }
-
-export default Taichi;
