@@ -123,6 +123,8 @@ export default class Main extends React.Component<{}> {
     }
 
     render() {
+        if (this.willBeRedirected)
+            return;
         let stf = this.showText.bind(this);
         return (
             <div className="Main">
