@@ -7,7 +7,6 @@ import Hexagram from "./Hexagram";
 import './Main.css';
 import Taichi from './Taichi';
 import HexagramText from './HexagramText';
-import Url from 'url-parse';
 
 export default class Main extends React.Component<{}> {
     yiCalculator = new YiCalculator();
@@ -83,10 +82,13 @@ export default class Main extends React.Component<{}> {
     changedRef = React.createRef<Hexagram>();
 
     private share(): YiNumbers {
-        let url = new Url(window.location.href);
-        url.set("query", `u=${this.lastUpper}&l=${this.lastLower}&c=${this.lastChanging}`);
-        this.textRef.current?.setText(
-            `复制以分享：${url.href}`);
+        let url = new URL(window.location.href);
+        url.search = "";
+        let params = url.searchParams;
+        params.append("u", (this.lastUpper as number)?.toString());
+        params.append("l", (this.lastLower as number)?.toString());
+        params.append("c", (this.lastChanging as number)?.toString());
+        this.textRef.current?.setText(`复制以分享：${url.href}`);
         return {
             upperValue: this.lastUpper as number,
             lowerValue: this.lastLower as number,
@@ -96,28 +98,26 @@ export default class Main extends React.Component<{}> {
 
     willBeRedirected = false;
     checkAndRedirect() {
-        let q = window.location.search;
-        let split = q.substring(1).split("&");
-        if (split.length !== 3)
-            return;
+        let url = new URL(window.location.href);
 
-        let us = split[0];
-        let ls = split[1];
-        let cs = split[2];
-        if (!us.startsWith("u=") || !ls.startsWith("l=") || !cs.startsWith("c="))
+        let u = url.searchParams.get("u");
+        if (u === null)
             return;
-        if (us === undefined || ls === undefined || cs === undefined)
+        let l = url.searchParams.get("l");
+        if (l === null)
+            return;
+        let c = url.searchParams.get("c");
+        if (c === null)
             return;
 
         this.cookieManager.saveNumbers({
-            upperValue: Number.parseInt(us.substring(2)),
-            lowerValue: Number.parseInt(ls.substring(2)),
-            changingValue: Number.parseInt(cs.substring(2))
+            upperValue: Number.parseInt(u),
+            lowerValue: Number.parseInt(l),
+            changingValue: Number.parseInt(c)
         });
         this.cookieManager.saveBoolean("fromShared", true);
 
-        let url = new Url(window.location.href);
-        url.set("query", "");
+        url.search = "";
         window.location.replace(url.href);
         this.willBeRedirected = true;
     }
