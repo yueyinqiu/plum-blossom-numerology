@@ -1,28 +1,38 @@
 import * as React from "react";
-import ActionBar, { ActionBarState } from "./ActionBar";
-import { Lunar } from 'lunar-typescript';
+import ActionBar from "./ActionBar";
+import YiCalculator, { YiNumbers } from "../tools/YiCalculator";
+import CookieManager from "../tools/CookieManager";
 import Clear from "./Clear";
 import Hexagram from "./Hexagram";
 import './Main.css';
 import Taichi from './Taichi';
 import HexagramText from './HexagramText';
+import Url from 'url-parse';
 
-const oneHour = 3600000;
+export default class Main extends React.Component<{}> {
+    yiCalculator = new YiCalculator();
+    cookieManager = new CookieManager();
 
-export default class Main extends React.Component {
-    private insertWithTime(withTime: boolean): ActionBarState {
-        let date = new Date();
-        if (date.getHours() === 23)
-            date = new Date(date.getTime() + oneHour);
-        let lunar = Lunar.fromDate(date);
-        let year = lunar.getYearZhiIndex() + 1;
-        let month = lunar.getMonth();
-        let day = lunar.getDay();
-        let time = lunar.getTimeZhiIndex() + 1;
-        let upper = year + month + day;
-        let lower = upper + time;
-        return { upperValue: upper, lowerValue: lower, changingValue: lower };
+    constructor() {
+        super({});
+        this.checkAndRedirect();
     }
+
+    private insertAll(withTime: boolean): YiNumbers {
+        if (withTime)
+            return this.yiCalculator.getYiNumbersByTime(new Date());
+
+        let numbers = this.cookieManager.getNumbers();
+        if (numbers === null)
+            return this.yiCalculator.getYiNumbersByTime(new Date());
+        else
+            return numbers;
+    }
+
+    private insertLine(yiNumbers: YiNumbers): YiNumbers {
+        return this.yiCalculator.getYiNumberWithTimeAddedLine(yiNumbers, new Date());
+    }
+
     private showText(text: string): void {
         this.textRef.current?.setText(text);
     }
@@ -30,72 +40,39 @@ export default class Main extends React.Component {
     lastUpper: number | null = null;
     lastLower: number | null = null;
     lastChanging: number | null = null;
-    private changeHexagrams(states: ActionBarState) {
-        let statesUpper = states.upperValue;
-        let statesLower = states.lowerValue;
-        let statesChanging = states.changingValue;
-
-        if (this.lastUpper === statesUpper &&
-            this.lastLower === statesLower &&
-            this.lastChanging === statesChanging)
+    private changeHexagrams(yiNumbers: YiNumbers, withAnimation: boolean) {
+        if (this.lastUpper === yiNumbers.upperValue &&
+            this.lastLower === yiNumbers.lowerValue &&
+            this.lastChanging === yiNumbers.changingValue)
             return;
 
-        this.lastUpper = statesUpper;
-        this.lastLower = statesLower;
-        this.lastChanging = statesChanging;
+        this.lastUpper = yiNumbers.upperValue;
+        this.lastLower = yiNumbers.lowerValue;
+        this.lastChanging = yiNumbers.changingValue;
+        this.cookieManager.saveNumbers(yiNumbers);
 
-        let upper = 8 - (statesUpper % 8 + 8) % 8;
-        if (upper === 8)
-            upper = 0;
-        let lower = 8 - (statesLower % 8 + 8) % 8;
-        if (lower === 8)
-            lower = 0;
-        // 经过如此转换，需自最小位为上看，如
-        // 兑：6 - 110
+        let hexagrams = this.yiCalculator.getHexagramNumbersByYiNumbers(yiNumbers);
 
-        let original = (lower << 3) + upper;
+        if (withAnimation) {
+            setTimeout(() => {
+                this.taichiRef.current?.rotate();
+                this.originalRef.current?.setHexagram(null);
+                this.interRef.current?.setHexagram(null);
+                this.changedRef.current?.setHexagram(null);
+                this.textRef.current?.setText(null);
+            });
 
-        let changing = 6 - (statesChanging % 6 + 6) % 6;
-        if (changing === 6)
-            changing = 0;
-        let changed = original ^ (1 << changing);
-
-        let interFrom = original === 0b000000 || original === 0b111111 ? changed : original;
-
-        interFrom >>= 1;
-        let line5 = interFrom & 1;
-        interFrom >>= 1;
-        let line4 = interFrom & 1;
-        interFrom >>= 1;
-        let line3 = interFrom & 1;
-        interFrom >>= 1;
-        let line2 = interFrom & 1;
-
-        let inter = line2;
-        inter <<= 1;
-        inter += line3;
-        inter <<= 1;
-        inter += line4;
-        inter <<= 1;
-        inter += line3;
-        inter <<= 1;
-        inter += line4;
-        inter <<= 1;
-        inter += line5;
-
-        setTimeout(() => {
-            this.taichiRef.current?.rotate();
-            this.originalRef.current?.setHexagram(null);
-            this.interRef.current?.setHexagram(null);
-            this.changedRef.current?.setHexagram(null);
-            this.textRef.current?.setText(null);
-        });
-
-        setTimeout(() => {
-            this.originalRef.current?.setHexagram(original);
-            this.interRef.current?.setHexagram(inter);
-            this.changedRef.current?.setHexagram(changed);
-        }, 600);
+            setTimeout(() => {
+                this.originalRef.current?.setHexagram(hexagrams.original);
+                this.interRef.current?.setHexagram(hexagrams.inter);
+                this.changedRef.current?.setHexagram(hexagrams.changed);
+            }, 600);
+        }
+        else {
+            this.originalRef.current?.setHexagram(hexagrams.original);
+            this.interRef.current?.setHexagram(hexagrams.inter);
+            this.changedRef.current?.setHexagram(hexagrams.changed);
+        }
     }
 
     taichiRef = React.createRef<Taichi>();
@@ -105,12 +82,52 @@ export default class Main extends React.Component {
     interRef = React.createRef<Hexagram>();
     changedRef = React.createRef<Hexagram>();
 
+    private share(): YiNumbers {
+        let url = new Url(window.location.href);
+        url.set("query", `u=${this.lastUpper}&l=${this.lastLower}&c=${this.lastChanging}`);
+        this.textRef.current?.setText(
+            `复制以分享：${url.href}`);
+        return {
+            upperValue: this.lastUpper as number,
+            lowerValue: this.lastLower as number,
+            changingValue: this.lastChanging as number
+        }
+    }
+
+    willBeRedirected = false;
+    checkAndRedirect() {
+        let q = window.location.search;
+        let split = q.substring(1).split("&");
+        if (split.length !== 3)
+            return;
+
+        let us = split[0];
+        let ls = split[1];
+        let cs = split[2];
+        if (!us.startsWith("u=") || !ls.startsWith("l=") || !cs.startsWith("c="))
+            return;
+        if (us === undefined || ls === undefined || cs === undefined)
+            return;
+
+        this.cookieManager.saveNumbers({
+            upperValue: Number.parseInt(us.substring(2)),
+            lowerValue: Number.parseInt(ls.substring(2)),
+            changingValue: Number.parseInt(cs.substring(2))
+        });
+        this.cookieManager.saveBoolean("fromShared", true);
+
+        let url = new Url(window.location.href);
+        url.set("query", "");
+        window.location.replace(url.toString());
+        this.willBeRedirected = true;
+    }
+
     render() {
         let stf = this.showText.bind(this);
         return (
             <div className="Main">
                 <Taichi ref={this.taichiRef}></Taichi>
-                <ActionBar ref={this.actionBarRef} insertFunction={this.insertWithTime.bind(this)} submitFunction={this.changeHexagrams.bind(this)}></ActionBar>
+                <ActionBar ref={this.actionBarRef} insertAllFunction={this.insertAll.bind(this)} submitFunction={this.changeHexagrams.bind(this)} insertLineFunction={this.insertLine.bind(this)} shareFunction={this.share.bind(this)}></ActionBar>
                 <div className="Hexagrams">
                     <Clear></Clear>
                     <Hexagram ref={this.originalRef} showTextFunction={stf} defaultName="本"></Hexagram>
@@ -124,10 +141,20 @@ export default class Main extends React.Component {
     }
 
     componentDidMountForTheFirstTime = false;
-    async componentDidMount() {
+    componentDidMount() {
+        if (this.willBeRedirected)
+            return;
         if (!this.componentDidMountForTheFirstTime) {
             this.componentDidMountForTheFirstTime = true;
-            this.actionBarRef.current?.performSubmit();
+
+            let fromShared = this.cookieManager.getBoolean("fromShared");
+
+            if (fromShared === null || fromShared) // 以前从未使用过，或者是通过分享链接而来
+                this.actionBarRef.current?.performSubmit(true);
+            else
+                this.actionBarRef.current?.performSubmit(false);
+
+            this.cookieManager.saveBoolean("fromShared", false);
         }
     }
 }

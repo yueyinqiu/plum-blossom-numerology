@@ -4,7 +4,7 @@
     user-select: none;
 }
 
-.ActionBar input {
+.ActionBar div input {
     width: 3.5em;
     padding: 3px 5px;
     border-radius: 2px;
@@ -13,8 +13,8 @@
     color: inherit;
 }
 
-.ActionBar input,
-.ActionBar button {
+.ActionBar div input,
+.ActionBar div button {
     font-family: inherit;
     font-size: 18px;
     margin: 5px;
@@ -22,17 +22,17 @@
 }
 
 @media screen and (max-width: 380px) {
-    .ActionBar input,
-    .ActionBar button {
+    .ActionBar div input,
+    .ActionBar div button {
         font-size: 15px;
     }
 }
 
-.ActionBar button:active {
+.ActionBar div button:active {
     background-color: #171717;
 }
 
-.ActionBar button {
+.ActionBar div button {
     padding: 4px 18px;
     background-color: #3F3F3F;
     color: #e3e3e3;
