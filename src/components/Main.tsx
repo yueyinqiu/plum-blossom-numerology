@@ -118,7 +118,7 @@ export default class Main extends React.Component<{}> {
 
         let url = new Url(window.location.href);
         url.set("query", "");
-        window.location.replace(url.toString());
+        window.location.replace(url.href);
         this.willBeRedirected = true;
     }
 
