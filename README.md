@@ -3,4 +3,3 @@
 
 ## 访问链接
 - Github Pages：https://yueyinqiu.github.io/mei-hua-pages/
-- Gitee Pages：http://yueyinqiu5990.gitee.io/mei-hua-pages/
